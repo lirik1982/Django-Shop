@@ -40,14 +40,16 @@ class Product(models.Model):
         return self.title
 
 
-class Custumer(models.Model):
+class Customer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=200)
     locality = models.CharField(max_length=200)
     city = models.CharField(max_length=50)
-    mobile = models.IntegerField(max_length=20)
+    mobile = models.IntegerField()
     zipcode = models.IntegerField()
     state = models.CharField(choices=STATE_CHOICES, max_length=100)
+
     def __str__(self):
         return self.name
+
 
