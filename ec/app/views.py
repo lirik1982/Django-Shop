@@ -122,6 +122,19 @@ def show_cart(request):
     return render(request, 'app/addtocart.html', locals())
 
 
+class checkout(View):
+    def get(self, request):
+        user = request.user
+        add=Customer.objects.filter(user=user)
+        cart_items=Cart.objects.filter(user=user)
+        famount = 0
+        for p in cart_items:
+            value = p.quantity * p.product.discounted_price
+            famount = famount + value
+        totalamount = famount + 40
+        return render(request, 'app/checkout.html', locals())
+
+
 def plus_cart(request):
     if request.method == 'GET':
         prod_id = request.GET['prod_id']
@@ -144,4 +157,42 @@ def plus_cart(request):
 
 
 def minus_cart(request):
-    pass
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.quantity -= 1
+        c.save()
+        user = request.user
+        cart = Cart.objects.filter(user=user)
+        amount = 0
+        for p in cart:
+            value = p.quantity * p.product.discounted_price
+            amount = amount + value
+        totalamount = amount + 40
+        data = {
+            'quantity': c.quantity,
+            'amount': amount,
+            'totalamount': totalamount
+        }
+        return JsonResponse(data)
+
+def remove_cart(request):
+    if request.method == 'GET':
+        prod_id = request.GET['prod_id']
+        c = Cart.objects.get(Q(product=prod_id) & Q(user=request.user))
+        c.delete()
+        user = request.user
+        cart = Cart.objects.filter(user=user)
+        amount = 0
+        for p in cart:
+            value = p.quantity * p.product.discounted_price
+            amount = amount + value
+        totalamount = amount + 40
+        data = {
+            'quantity': c.quantity,
+            'amount': amount,
+            'totalamount': totalamount
+        }
+        return JsonResponse(data)
+
+
